@@ -65,11 +65,25 @@ The abstract should briefly summarize the contents of the paper in
 \section{Introduction}
 \label{Introduction}
 
-in machine translation from natural language to logic using 
-SUMO \url{https://github.com/ontologyportal/sumo} terms.  User wishing to install the system should follow the README at \url{https://github.com/ontologyportal/sumonlp}
-\end{sloppypar}
+SUMO-ML-NLP is a tool chain that uses Machine Learning (ML) for translation of natural language to 
+logic, Automated Theorem Proving (ATP) to reason about the logic, and Natural Language Processing
+(NLP) to translate the results of the reasoning to natural language.
+SUMO-ML-NLP is unique in that it leverages the rich SUMO ontology~\cite{Pea11} and supporting
+infrastructure~\cite{PB10-IKBET} to provide
+background knowledge for the translations.
 
-The system uses machine learning techniques to simplify inputs and convert them to mathematical logic expressions that can then be used in formal theorem proving with Vampire or other provers.
+\paragraph{RICHARD:}
+The use of deductive technique for question answering is a well known quest, harking back
+to early work by Cordell Green and Bertram Raphael~\cite{GR68,Gre69}, with significant 
+community effort since then~\cite{GCW10}.
+Purely deductive efforts include~\cite{FG+08,SYT09}, and approaches that integrate deduction
+with NLP include~\ref{TBA}.
+Work closest to SUMO-ML-NLP are with the use of the Cyc ontology~\cite{CMB05}, the 
+Inquire Biology knowledge base~\cite{CC+13}, and use of provenance information in answering
+semantic web queries\cite{MP04}.
+
+The complete architecture of SUMO-ML-NLP is shown in Figure~\ref{ArchitecturePicture}, and the
+details of the various compoments are given in Sections~\ref{Training}~and~\ref{Running}.
 
 In step 1 of Figure \ref{fig:arch} a user enters a statement or question in natural language that is passed in step 2 to a component (based on OLLaMa) that attempts to detect whether any metaphors are present and then attempts to translate them to a literal reading if so.
 In step 3 the result of metaphor rephrasing is passed to a component that attempts to simplify complex sentences into a set of shorter and simpler sentences.  It is also based around OLLaMa.  We also use the Stanford Stanza system to recognize co-references (such as pronouns) and replace them with the most meaningful token from the original sentence.  For example, if presented with the sentence ``John went to the store and he bought cookies.'' simplification might generate ``John went to the store.'', ``He bought cookies.''  We process sentences one at a time so ``He'' would not be meaningful.  Instead, we replace ``He'' with ``John''.
@@ -104,9 +118,6 @@ Finally, in step 7 these statements are combined with the existing content of SU
 
 We have an early (inactive) prototype in our pipeline that attempts to provide an English arguments instead of a mathematical proof.  It is currently deactivated but can be tested by uncommenting code in sumonlp/src/runpipeline.sh.
 
-
-\section{Synthetic Corpus Generation}
-
 This SigmaNLP code \url{https://github.com/ontologyportal/sigmanlp}
 generates language-logic pairs designed for training a machine learning system. Several approaches are used:
 
@@ -115,20 +126,6 @@ generates language-logic pairs designed for training a machine learning system. 
 \item run through all formulas in SUMO and generate NL paraphrases
 \item build up sentences and logic expressions compositionally
 \end{itemize}
-
-\paragraph{Related Work} \\
-RICHARD
-
-\cite{Gre69}
-\cite{MP04}
-\cite{CMB05}
-\cite{MC+06}
-\cite{FG+08}
-\cite{SYT09}
-\cite{GCW10}
-\cite{FGP10}
-\cite{PB10-IKBET}
-\cite{CC+13}
 
 %--------------------------------------------------------------------------------------------------
 \section{Architecture}
@@ -165,7 +162,7 @@ JARRAD
 ANGELOS
 
 %--------------------------------------------------------------------------------------------------
-\section{Answering the Query}
+\subsection{Answering the Query}
 \label{AnsweringQuery}
 
 ANGELOS
