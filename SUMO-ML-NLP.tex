@@ -39,6 +39,7 @@
 \author{
 Adam Pease\inst{1}\orcidID{0000-0001-9772-1266} \and
 Roberto Milanese\inst{1}\orcidID{0009-0009-5107-162X} \and
+Terry Norbraten\inst{1}\orcidID{0000-0000-0000-0000} \and
 Jarrad Singley\inst{1}\orcidID{0009-0009-7640-3782} \and
 Richard Thompson\inst{1}\orcidID{0009-0001-6541-1092} \and
 Angelos Toutisios\inst{1}\orcidID{0009-0009-6064-5154} \and
@@ -47,7 +48,7 @@ Geoff Sutcliffe\inst{2}\orcidID{0000-0001-9120-3927}}
 \authorrunning{A. Pease et al.}
 
 \institute{Naval Postgraduate School, Monterey, USA \\
-\email{\{adam.pease,roberto.milanese,jarrad.singley,richard.thompson,angelos.toutsios.gr\}@nps.edu}\\
+\email{\{adam.pease,roberto.milanese,tdnorbra@nps.edu,jarrad.singley,richard.thompson,angelos.toutsios.gr\}@nps.edu}\\
 \and
 University of Miami, Miami, USA \\
 \email{geoff@cs.miami.edu}}
@@ -93,9 +94,42 @@ Inquire Biology knowledge base~\cite{CC+13}, and use of provenance information i
 semantic web queries\cite{MP04}.
 
 The complete architecture of SUMO-ML-NLP is shown in Figure~\ref{ArchitecturePicture}, and the
-details of the various compoments are given in Sections~\ref{Training}~and~\ref{Running}.
+details of the various components are given in Sections~\ref{Training}~and~\ref{Running}.
+In the training phase blah blah:
+\begin{itemize}
+\item blah blah
+\end{itemize}
 
-In step 1 of Figure \ref{fig:arch} a user enters a statement or question in natural language that is passed in step 2 to a component (based on OLLaMa) that attempts to detect whether any metaphors are present and then attempts to translate them to a literal reading if so.
+In the query preprartion phase blah blah.
+This query is used to illustrate the processing steps:
+\emph{The nightmare hurricane Milton destroyed the beautiful bell pepper crop in western Florida, 
+and it left many residents homeless.}
+\begin{itemize}
+\item Metaphor Rephrasing (using Ollama) rephrases the metaphor \emph{nightmare}, producing 
+      \emph{The very bad hurricane Milton destroyed the beautiful bell pepper crop in western 
+      Florida, and it left many residents homeless.}
+\item Sentence Simplification removes the unnecessary adjectives \emph{very} and \emph{beautiful}, 
+      and splits the sentence into two, producing \emph{Bad hurricane Milton destroyed the bell 
+      pepper crop in western Florida. It left many residents homeless.}
+\item Co-reference Resolution (using the Stanford Stanza package) instantiates the \emph{It}, 
+      producing \emph{Bad hurricane Milton destroyed the bell pepper crop in western Florida. 
+      Hurricane Milton left many residents homeless.}
+      This would have been complicated if \emph{it} had been omitted from the original sentence,
+      which would still have been common natural language.
+\item Out of Vocabulary Detection uses the Stanford Stanza Named Entity Recognition system to
+      replaces the unknown name \emph{Milton} with a \texttt{UNK} token, producing \emph{Bad 
+      hurricane \texttt{UNK\_OBJ\_1} destroyed the bell pepper crop in western Florida.
+      Hurricane \texttt{UNK\_OBJ\_1} left many residents homeless.}.
+      The pair \texttt{UNK\_OBJ\_1-Milton} is recorded in the Out of Vocabulary Memory.
+\item What about "bell pepper"?
+\end{itemize}
+
+In the query solving phase blah blah:
+\begin{itemize}
+\item blah blah
+\end{itemize}
+
+
 In step 3 the result of metaphor rephrasing is passed to a component that attempts to simplify complex sentences into a set of shorter and simpler sentences.  It is also based around OLLaMa.  We also use the Stanford Stanza system to recognize co-references (such as pronouns) and replace them with the most meaningful token from the original sentence.  For example, if presented with the sentence ``John went to the store and he bought cookies.'' simplification might generate ``John went to the store.'', ``He bought cookies.''  We process sentences one at a time so ``He'' would not be meaningful.  Instead, we replace ``He'' with ``John''.
 
 Since there are a potentially infinite set of things like people and place names that will not be present in our training data set, we try to recognize words and phrases that are out of the training vocabulary (step 4).  We use the Stanford Stanza Named Entity Recognition (NER) system to find these words or phrases and guess at their types.  We have mapped the types to SUMO and use that to state the basic identity of the word or phrase.  For example, if we have ``John climbed Mt. St. Helens.'' NER should recognize ``Mt. St. Helens'' as a place, which would then be asserted as an instance of a SUMO \texttt{GeographicArea}.  We include a set of generic tags in our training data to cover unknown vocabulary, so we process the sentence into ``John climbs UNK-Region-1.''  We can then perform machine translation (step 5) to convert that language to logic as follows:
@@ -179,6 +213,13 @@ ANGELOS
 
 ADAM
 
+%--------------------------------------------------------------------------------------------------
+\section{Testing and Results}
+\label{Testing}
+
+RICHARD
+
+TERRY 
 %--------------------------------------------------------------------------------------------------
 \section{Conclusion}
 \label{Conclusion}
