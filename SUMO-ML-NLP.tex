@@ -34,21 +34,21 @@
 \renewcommand{\floatpagefraction}{0.66}
 \setlength{\floatsep}{2.0pt plus 2.0pt minus 2.0pt}
 \setlength{\textfloatsep}{5.0pt plus 2.0pt minus 0.0pt}
-\title{SUMO-ML-NLP: A Neuro-Symbolic Question Answering System}
+\title{SUMO-ML-NLP: \\ A Neuro-Symbolic Question Answering System}
 \titlerunning{SUMO-ML-NLP}
 \author{
-Adam Pease\inst{1}\orcidID{0000-0001-9772-1266} \and
-Roberto Milanese\inst{1}\orcidID{0009-0009-5107-162X} \and
-Terry Norbraten\inst{1}\orcidID{0009-0000-5370-8916} \and
-Jarrad Singley\inst{1}\orcidID{0009-0009-7640-3782} \and
-Richard Thompson\inst{1}\orcidID{0009-0001-6541-1092} \and
-Angelos Toutisios\inst{1}\orcidID{0009-0009-6064-5154} \and
-Geoff Sutcliffe\inst{2}\orcidID{0000-0001-9120-3927}}
+Adam~Pease\inst{1}\orcidID{0000-0001-9772-1266} \and
+Roberto~Milanese\inst{1}\orcidID{0009-0009-5107-162X} \and
+Terry~Norbraten\inst{1}\orcidID{0009-0000-5370-8916} \and
+Jarrad~Singley\inst{1}\orcidID{0009-0009-7640-3782} \and
+Richard~Thompson\inst{1}\orcidID{0009-0001-6541-1092} \and
+Angelos~Toutisios\inst{1}\orcidID{0009-0009-6064-5154} \and
+Geoff~Sutcliffe\inst{2}\orcidID{0000-0001-9120-3927}}
 
 \authorrunning{A. Pease et al.}
 
 \institute{Naval Postgraduate School, Monterey, USA \\
-\email{\{adam.pease,roberto.milanese,tdnorbra@nps.edu,jarrad.singley,richard.thompson,angelos.toutsios.gr\}@nps.edu}\\
+\email{\{adam.pease,roberto.milanese,tdnorbra@nps.edu,jarrad.singley,\\ richard.thompson,angelos.toutsios.gr\}@nps.edu}\\
 \and
 University of Miami, Miami, USA \\
 \email{geoff@cs.miami.edu}}
@@ -93,52 +93,74 @@ Work closest to SUMO-ML-NLP are with the use of the Cyc ontology~\cite{CMB05}, t
 Inquire Biology knowledge base~\cite{CC+13}, and use of provenance information in answering
 semantic web queries\cite{MP04}.
 
-The complete architecture of SUMO-ML-NLP is shown in Figure~\ref{ArchitecturePicture}, and the
-details of the various components are given in Sections~\ref{Training}~and~\ref{Running}.
-In the training phase blah blah:
+The complete architecture of SUMO-ML-NLP is shown in Figure~\ref{ArchitecturePicture}.
+An overview of the processing is given here; the details are given in 
+Sections~\ref{Training}~and~\ref{Running}.
+
+\begin{figure}
+\includegraphics[width=\textwidth]{Architecture.pdf}
+\caption{SUMO-ML-NLP architecture}
+\label{ArchitecturePicture}
+\end{figure}
+
+In the training phase language-logic pairs are created, designed for training a machine learning 
+system. 
+Several approaches are used:
+
 \begin{itemize}
-\item AutoDoc
-\item Relation Instantion
-\item Generation of Symbols
+\item build up sentences and logic expressions compositionally
+\end{itemize}
+
+\begin{itemize}
+\item AutoDoc runs through all formulae in SUMO and generates natural language paraphrases,
+      e.g., ADAM PLACE
+\item Relation Instantion instantiates relations with arguments of appropriate types, then 
+      generates natural language paraphrases from them, e.g., ADAM PLEASE.
+\item Generation of Symbols builds up sentences and logic expressions compositionally, e.g.,
+      ADAM PLEASE.
 \item Google T5 Training
 \end{itemize}
 
-In the query preprartion phase blah blah.
-This query is used to illustrate the processing steps:
+In the query preparation phase the query is reduced to simple unambiguous sentences; this query 
+is used to illustrate the processing steps:
 \emph{The nightmare hurricane Milton destroyed the beautiful bell pepper crop in western Florida, 
-and it left many residents homeless.}
+and it left many residents homeless. How did Milton affect Publix supermarkets?}
 \begin{itemize}
 \item Metaphor Rephrasing (using Ollama) rephrases the metaphor \emph{nightmare}, producing 
       \emph{The very bad hurricane Milton destroyed the beautiful bell pepper crop in western 
-      Florida, and it left many residents homeless.}
+      Florida, and it left many residents homeless. How did Milton affect Publix supermarkets?}
 \item Sentence Simplification removes the unnecessary adjectives \emph{very} and \emph{beautiful}, 
       and splits the sentence into two, producing \emph{Bad hurricane Milton destroyed the bell 
-      pepper crop in western Florida. It left many residents homeless.}
+      pepper crop in western Florida. It left many residents homeless. How did Milton affect 
+      Publix supermarkets?}
 \item Co-reference Resolution (using the Stanford Stanza package) instantiates the \emph{It}, 
       producing \emph{Bad hurricane Milton destroyed the bell pepper crop in western Florida. 
-      Hurricane Milton left many residents homeless.}
+      Hurricane Milton left many residents homeless. How did Milton affect Publix supermarkets?}
       This would have been complicated if \emph{it} had been omitted from the original sentence,
       which would still have been common natural language.
 \item Out of Vocabulary Detection uses the Stanford Stanza Named Entity Recognition system to
-      replaces the unknown name \emph{Milton} with a \texttt{UNK} token, producing \emph{Bad 
-      hurricane \texttt{UNK\_OBJ\_1} destroyed the bell pepper crop in western Florida.
-      Hurricane \texttt{UNK\_OBJ\_1} left many residents homeless.}.
-      The pair \texttt{UNK\_OBJ\_1-Milton} is recorded in the Out of Vocabulary Memory.
-\item What about "bell pepper"?
+      replaces the unknown names \emph{Milton} and \emph{Publix} with \texttt{UNK} tokens, 
+      producing \emph{Bad hurricane \texttt{UNK\_OBJ\_1} destroyed the bell pepper crop in 
+      western Florida. Hurricane \texttt{UNK\_OBJ\_1} left many residents homeless.
+      How did \texttt{UNK\_OBJ\_1} affect \texttt{UNK\_OBJ\_2} supermarkets?}.
+      The pairs \texttt{UNK\_OBJ\_1-Milton} and \texttt{UNK\_OBJ\_2-Publix} are recorded in the 
+      Out of Vocabulary Memory.
 \end{itemize}
 
 In the query solving phase blah blah:
 \begin{itemize}
-\item Google T5 Running
-\item Out of Vocabulary Replacement
-\item Automated Theorem Prover
-\item Proof to Language (using Ollama)
+\item Google T5 Running uses the language to logic model to produce SUO-KIF logic for the query,
+      producing ADAM PLEASE.
+\item Out of Vocabulary Replacement replaces the \texttt{UNK} tokens with the corresponding terms
+      saved in the Out of Vocabulary Memory, producing ADAM PLEASE.
+\item Automated Theorem Proving (ATP) combines the SUMO ontology with the logic generated from the
+      query, converts it to the TPTP typed first-order logic (TFF) format~\cite{Sut23-IGPL},
+      and runs an ATP system, e.g., Vampire~\cite{KV13}, producing a TSTP format~\cite{SZS04} 
+      proof GEOFF PLEASE.
+\item Proof to Language (using Ollama) is an an early prototype in our pipeline, which attempts 
+      to COnvert the logical proof to a natural language answer.
 \end{itemize}
 
-
-In step 3 the result of metaphor rephrasing is passed to a component that attempts to simplify complex sentences into a set of shorter and simpler sentences.  It is also based around OLLaMa.  We also use the Stanford Stanza system to recognize co-references (such as pronouns) and replace them with the most meaningful token from the original sentence.  For example, if presented with the sentence ``John went to the store and he bought cookies.'' simplification might generate ``John went to the store.'', ``He bought cookies.''  We process sentences one at a time so ``He'' would not be meaningful.  Instead, we replace ``He'' with ``John''.
-
-Since there are a potentially infinite set of things like people and place names that will not be present in our training data set, we try to recognize words and phrases that are out of the training vocabulary (step 4).  We use the Stanford Stanza Named Entity Recognition (NER) system to find these words or phrases and guess at their types.  We have mapped the types to SUMO and use that to state the basic identity of the word or phrase.  For example, if we have ``John climbed Mt. St. Helens.'' NER should recognize ``Mt. St. Helens'' as a place, which would then be asserted as an instance of a SUMO \texttt{GeographicArea}.  We include a set of generic tags in our training data to cover unknown vocabulary, so we process the sentence into ``John climbs UNK-Region-1.''  We can then perform machine translation (step 5) to convert that language to logic as follows:
 
 \begin{verbatim}
 (exists (?J ?C ?R)
@@ -164,36 +186,31 @@ post processing (step 6) replaces the unknown term and asserts its type
     (agent ?C ?J)))
 \end{verbatim}
 
-Finally, in step 7 these statements are combined with the existing content of SUMO.   If the user subsequently issues the command ``test'' to the system, then Vampire will attempt to find a contradiction among the previously asserted statements and SUMO and provide a detailed proof (step 8).  If the English input is a question then this will become a logical conjecture that Vampire attempts to prove.
-
-We have an early (inactive) prototype in our pipeline that attempts to provide an English arguments instead of a mathematical proof.  It is currently deactivated but can be tested by uncommenting code in sumonlp/src/runpipeline.sh.
-
-This SigmaNLP code \url{https://github.com/ontologyportal/sigmanlp}
-generates language-logic pairs designed for training a machine learning system. Several approaches are used:
-
-\begin{itemize}
-\item instantiate relations with arguments of appropriate types and then generate NL paraphrases from them
-\item run through all formulas in SUMO and generate NL paraphrases
-\item build up sentences and logic expressions compositionally
-\end{itemize}
-
-%--------------------------------------------------------------------------------------------------
-\section{Architecture}
-\label{Architecture}
-
-\begin{figure}
-\includegraphics[width=\textwidth]{Architecture.pdf}
-\caption{SUMO-ML-NLP architecture}
-\label{ArchitecturePicture}
-\end{figure}
-
-GEOFF
-
 %--------------------------------------------------------------------------------------------------
 \section{Training the SUMO Model}
 \label{Training}
 
 ADAM
+
+The compositional generation is potentially the most comprehensive. It consists of building ever more complex statements that wrap or extend simpler statements. Originally, this meant starting with a simple subject-verb-object but now encompasses a host of different constructs:
+
+\begin{itemize}
+\item six tenses (part, present, future and progressive or not) and correspond to SUMO expressions relative to a diectic 'Now'
+\item  negation (for action sentences and separately for attitude wrappers that require higher-order logic, such as \texttt{believes}, \texttt{knows} etc)
+\item  frequency-based selection of nouns and verbs
+\item  human names and social roles
+\item  restrict human actions with \texttt{CaseRole} of \texttt{agent} to be \texttt{IntentionalProcess}(es) and otherwise use the \texttt{CaseRole} of 'experiencer'
+\item  use WordNet's noun and verb morphological exception lists
+\item  counts of objects (0-10) are used randomly a small portion of the time, divided between using numerals some times and digits other times
+\item  quantities of substances with units are used randomly a small portion of the time
+\item  Some sentences have metric dates and times, in several formats
+\item  Queries ('what','who') are generated sometimes, and with a question mark
+\item  WordNet verb frames are used that index verbs to a context of use. However, this is quite limited compared to VerbNet and FrameNet, and still allows many semantically non-sensical sentences to be generated, while also missing some common sentence forms, especially use of prepositions
+\item  Sentences with all variations of SUMO's \texttt{modalAttribute} are generated (\texttt{Possibility}, \texttt{Obligation} etc)
+\item  Sentences with all variations of SUMO's \texttt{PropositionalAttitudes} are generated \texttt{believes},\texttt{knows},\texttt{says} etc
+\item  Sentences with \texttt{says} have their content quoted
+\item Imperative sentences with the English ``You (understood)'' form
+\end{itemize}
 
 %--------------------------------------------------------------------------------------------------
 \section{Running a Query}
