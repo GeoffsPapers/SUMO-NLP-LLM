@@ -82,15 +82,20 @@ systems, e.g.,~\cite{GR68,Gre69}, and later work includes~\cite{FG+08,SYT09}, wi
 community effort evident~\cite{GCW10}.
 Purely NLP-based approaches include~\cite{WHAT}.
 Approaches that integrate deduction with NLP were heralded by Terry Winograd's SHRDLU~\cite{Win71},
-and subsequent efforts include~\cite{WHAT,JS24}.
+and subsequent efforts include~\cite{MB16,GZ+23,JS24}.
 Recent advances in generative language systems have made question answering directly possible
 based on data learned from the internet and other large corpora, 
 e.g.,~\cite{Ope23,TM+23,Gem23}, sometimes augmented by domain-specific content in 
 retrieval-augmented generation systems, e.g.,\cite{Cha22}.
-As results from purely generative systems can be erroneous~\cite{HY+24}, using symbolic reasoning, 
-deductive reasoning in particular, to verify the generated answers, is a rich field of 
-research~\cite{HMS24}.
-Work closest to SUMO-ML-NLP are with the use of the Cyc ontology~\cite{CMB05}, the 
+As results from purely generative systems can be erroneous~\cite{MPD24,HY+24}, using symbolic 
+reasoning, deductive reasoning in particular, to verify the generated answers, is a rich field of 
+research~\cite{MB24,HMS24}.
+A prerequisite to this approach is automating the translation from natural language to logic,
+which part of the SUMO-ML-NLP pipeline.
+Using an LLM to do the translation is one possibility~\cite{Ban23,TJ+24}, and can be 
+successful with a large anough corpus of language-logic pairs for training the LLM~\cite{YX+24}.
+A full pipeline from natural language question to answer is investigated in~\cite{TJ+23}
+Other work that leverages a large corpus of knowledge includes the Cyc ontology~\cite{CMB05}, the 
 Inquire Biology knowledge base~\cite{CC+13}, and use of provenance information in answering
 semantic web queries\cite{MP04}.
 
@@ -129,26 +134,24 @@ Several approaches are used:
 In the query preparation phase the query is reduced to simple unambiguous sentences; this query 
 is used to illustrate the processing steps:
 \emph{The nightmare hurricane Milton destroyed the beautiful bell pepper crop in western Florida, 
-and it left many residents homeless. How did Milton affect Publix supermarkets?}
+and left many residents homeless. How did Milton affect Publix supermarkets?}
 \begin{itemize}
 \item Metaphor Rephrasing (using Ollama) rephrases the metaphor \emph{nightmare}, producing 
       \emph{The very bad hurricane Milton destroyed the beautiful bell pepper crop in western 
-      Florida, and it left many residents homeless. How did Milton affect Publix supermarkets?}
-\item Sentence Simplification removes the unnecessary adjectives \emph{very} and \emph{beautiful}, 
-      and splits the sentence into two, producing \emph{Bad hurricane Milton destroyed the bell 
-      pepper crop in western Florida. It left many residents homeless. How did Milton affect 
-      Publix supermarkets?}
+      Florida and left many residents homeless. How did Milton affect Publix supermarkets?}
+\item Sentence Simplification splits the sentence into two, producing \emph{The very bad 
+      hurricane Milton destroyed the beautiful bell pepper crop in western Florida. It left many 
+      residents homeless. How did Milton affect Publix supermarkets?}
 \item Co-reference Resolution (using the Stanford Stanza package) instantiates the \emph{It}, 
-      producing \emph{Bad hurricane Milton destroyed the bell pepper crop in western Florida. 
-      Hurricane Milton left many residents homeless. How did Milton affect Publix supermarkets?}
-      This would have been complicated if \emph{it} had been omitted from the original sentence,
-      which would still have been common natural language.
+      producing \emph{The very bad hurricane Milton destroyed the beautiful bell pepper crop in 
+      western Florida. Hurricane Milton left many residents homeless. How did Milton affect 
+      Publix supermarkets?}
 \item Out of Vocabulary Detection uses the Stanford Stanza Named Entity Recognition system to
       replaces the unknown names \emph{Milton} and \emph{Publix} with \texttt{UNK} tokens, 
-      producing \emph{Bad hurricane \texttt{UNK\_OBJ\_1} destroyed the bell pepper crop in 
-      western Florida. Hurricane \texttt{UNK\_OBJ\_1} left many residents homeless.
-      How did \texttt{UNK\_OBJ\_1} affect \texttt{UNK\_OBJ\_2} supermarkets?}.
-      The pairs \texttt{UNK\_OBJ\_1-Milton} and \texttt{UNK\_OBJ\_2-Publix} are recorded in the 
+      producing \emph{The very bad hurricane \texttt{UNK\_NOUN\_1} destroyed the beautiful bell 
+      pepper crop in western Florida. Hurricane \texttt{UNK\_NOUN\_1} left many residents homeless.
+      How did \texttt{UNK\_NOUN\_1} affect \texttt{UNK\_NOUN\_2} supermarkets?}.
+      The pairs \texttt{UNK\_NOUN\_1-Milton} and \texttt{UNK\_NOUN\_2-Publix} are recorded in the 
       Out of Vocabulary Memory.
 \end{itemize}
 
